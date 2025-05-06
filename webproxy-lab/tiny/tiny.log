@@ -1,0 +1,84 @@
+Accepted connection from (localhost, 34644)
+Request headers:
+GET / HTTP/1.1
+Header: Host: localhost:8080
+Header: Connection: keep-alive
+Header: sec-ch-ua: "Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"
+Header: sec-ch-ua-mobile: ?0
+Header: sec-ch-ua-platform: "Windows"
+Header: Upgrade-Insecure-Requests: 1
+Header: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Header: Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Header: Sec-Fetch-Site: none
+Header: Sec-Fetch-Mode: navigate
+Header: Sec-Fetch-User: ?1
+Header: Sec-Fetch-Dest: document
+Header: Accept-Encoding: gzip, deflate, br, zstd
+Header: Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Accepted connection from (localhost, 34652)
+Request headers:
+GET /cgi-bin/adder?x=1&y=2 HTTP/1.1
+Header: Host: localhost:8080
+Header: Connection: keep-alive
+Header: Cache-Control: max-age=0
+Header: sec-ch-ua: "Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"
+Header: sec-ch-ua-mobile: ?0
+Header: sec-ch-ua-platform: "Windows"
+Header: Upgrade-Insecure-Requests: 1
+Header: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Header: Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Header: Sec-Fetch-Site: none
+Header: Sec-Fetch-Mode: navigate
+Header: Sec-Fetch-User: ?1
+Header: Sec-Fetch-Dest: document
+Header: Accept-Encoding: gzip, deflate, br, zstd
+Header: Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Accepted connection from (localhost, 34654)
+Request headers:
+GET /godzilla.gif HTTP/1.1
+Header: Host: localhost:8080
+Header: Connection: keep-alive
+Header: sec-ch-ua-platform: "Windows"
+Header: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Header: sec-ch-ua: "Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"
+Header: sec-ch-ua-mobile: ?0
+Header: Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+Header: Sec-Fetch-Site: same-origin
+Header: Sec-Fetch-Mode: no-cors
+Header: Sec-Fetch-Dest: image
+Header: Referer: http://localhost:8080/
+Header: Accept-Encoding: gzip, deflate, br, zstd
+Header: Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Accepted connection from (localhost, 50756)
+Request headers:
+GET / HTTP/1.1
+Header: Host: localhost:8080
+Header: Connection: keep-alive
+Header: Cache-Control: max-age=0
+Header: sec-ch-ua: "Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"
+Header: sec-ch-ua-mobile: ?0
+Header: sec-ch-ua-platform: "Windows"
+Header: Upgrade-Insecure-Requests: 1
+Header: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Header: Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Header: Sec-Fetch-Site: none
+Header: Sec-Fetch-Mode: navigate
+Header: Sec-Fetch-User: ?1
+Header: Sec-Fetch-Dest: document
+Header: Accept-Encoding: gzip, deflate, br, zstd
+Header: Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Accepted connection from (localhost, 50770)
+Request headers:
+GET /godzilla.gif HTTP/1.1
+Header: Host: localhost:8080
+Header: Connection: keep-alive
+Header: sec-ch-ua-platform: "Windows"
+Header: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Header: sec-ch-ua: "Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"
+Header: sec-ch-ua-mobile: ?0
+Header: Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+Header: Sec-Fetch-Site: same-origin
+Header: Sec-Fetch-Mode: no-cors
+Header: Sec-Fetch-Dest: image
+Header: Referer: http://localhost:8080/
+Header

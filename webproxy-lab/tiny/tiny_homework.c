@@ -9,13 +9,14 @@
 #include "csapp.h"
 
 void doit(int fd);
-void read_requesthdrs(rio_t *rp);
+void read_requesthdrs(rio_t *rp, int *content_length);
 int parse_uri(char *uri, char *filename, char *cgiargs);
-void serve_static(int fd, char *filename, int filesize);
+void serve_static(int fd, char *filename, int filesize, int is_head);
 void get_filetype(char *filename, char *filetype);
 void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum, char *shortmsg,
                  char *longmsg);
+void sigchild_handler(int sig); //11.8
 
 int main(int argc, char **argv)
 {
@@ -30,6 +31,11 @@ int main(int argc, char **argv)
     fprintf(stderr, "usage: %s <port>\n", argv[0]);
     exit(1);
   }
+
+  // 11.8 자식 죽었을 때 핸들러 등록 
+  // 핸들러는 항상 시그널이 발생하기 전에 미리 등록
+  Signal(SIGCHLD, sigchild_handler); 
+  Signal(SIGPIPE, SIG_IGN);  // 11.13: Broken pipe 무시
 
   listenfd = Open_listenfd(argv[1]);
   while (1)
@@ -57,6 +63,8 @@ void doit(int fd)
         cgiargs[MAXLINE];         // CGI 프로그램 인자 (query string)
   rio_t rio;                      // RIO(Read-IO) 버퍼 구조체
 
+  int is_head = 0;                // 11.11을 위한 플래그
+
   Rio_readinitb(&rio, fd);
   Rio_readlineb(&rio, buf, MAXLINE);
   printf("Request headers:\n");
@@ -64,14 +72,25 @@ void doit(int fd)
   sscanf(buf, "%s %s %s",method, uri, version);
 
   /* GET 이외의 메서드는 미구현 에러 반환 */
-  if (strcasecmp(method, "GET")){
+  if (strcasecmp(method, "GET") && strcasecmp(method, "HEAD") && strcasecmp(method, "POST")){ // 11.11 & 11.12
     clienterror(fd, method, "501", "Not implemented", "Tiny does not implement this method");
     return;
   }
-  read_requesthdrs(&rio);
 
+  if (!strcasecmp(method, "HEAD")) //11.11
+    is_head = 1;
+
+  int is_post = !strcasecmp(method, "POST"); //11.12
+  int content_length = 0; //11.12
+  read_requesthdrs(&rio, &content_length);
 
   is_static = parse_uri(uri, filename, cgiargs);
+
+  //11.12
+  if (is_post){
+    Rio_readnb(&rio, cgiargs, content_length);
+    cgiargs[content_length] = '\0';  // null-terminate
+  }
 
   /* 파일 존재 검사 */
   if (stat(filename, &sbuf) < 0){
@@ -85,7 +104,7 @@ void doit(int fd)
       clienterror(fd, filename, "403", "Forbidden", "Tiny couldn't read the file");
       return;
     }
-    serve_static(fd, filename, sbuf.st_size);
+    serve_static(fd, filename, sbuf.st_size, is_head);
   }
   else{  
     /* 동적( CGI ) 파일 실행 권한 및 일반 파일 여부 확인 */
@@ -126,14 +145,16 @@ void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longms
     Rio_writen(fd, body, strlen(body));
 }
 
-void read_requesthdrs(rio_t *rp)
+void read_requesthdrs(rio_t *rp, int *content_length)
 {
   char buf[MAXLINE];
 
   Rio_readlineb(rp, buf, MAXLINE);
   while(strcmp(buf, "\r\n")){
+    if (strncasecmp(buf, "Content-Length:", 15) == 0)
+      *content_length = atoi(buf + 15);
+    printf("Header: %s", buf);  // 11.6.A 버리기 전에 echo! 
     Rio_readlineb(rp, buf, MAXLINE);
-    printf("%s", buf);
   }
   return;
 }
@@ -164,16 +185,17 @@ int parse_uri(char *uri, char *filename, char *cgiargs)
     if (ptr) {
       strcpy(cgiargs, ptr+1);   /* '?' 다음 위치부터 인자 복사 */
       *ptr = '\0';              /* filename용 URI는 '?' 앞까지만 남김 */
+
     }
     else
       strcpy(cgiargs, "");
-    strcpy(filename, ".");
-    strcat(filename, uri);
+      strcpy(filename, ".");
+      strcat(filename, uri);
     return 0;
   }
 }
 
-void serve_static(int fd, char *filename, int filesize)
+void serve_static(int fd, char *filename, int filesize, int is_head)
 {
     int srcfd;
     char *srcp;
@@ -188,12 +210,18 @@ void serve_static(int fd, char *filename, int filesize)
     sprintf(buf, "%sContent-type: %s\r\n\r\n", buf, filetype);
     Rio_writen(fd, buf, strlen(buf));
 
+    if (is_head) return; //11.11
+
     /* 2) 파일을 메모리에 매핑하여 전송 */
     srcfd = Open(filename, O_RDONLY, 0);
-    srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
+    // 11.9
+    // srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
+    srcp = (char *)malloc(filesize);
+    Rio_readn(srcfd,srcp,filesize);
     Close(srcfd);
     Rio_writen(fd, srcp, filesize);
-    Munmap(srcp, filesize);
+    // Munmap(srcp, filesize);
+    free(srcp);
 }
 
 /* get_filetype - 파일명 확장자에 따라 Content-Type 문자열 결정 */
@@ -207,6 +235,8 @@ void get_filetype(char *filename, char *filetype)
         strcpy(filetype, "image/jpeg");
     else if (strstr(filename, ".png"))
         strcpy(filetype, "image/png");
+    else if (strstr(filename, ".mpg")) // 11.7 MPG 비디오 파일 추가 
+        strcpy(filetype, "video/mpeg");
     else
         strcpy(filetype, "text/plain");
 }
@@ -227,5 +257,17 @@ void serve_dynamic(int fd, char *filename, char *cgiargs)
         perror("Execve error");
 
     }
-    Wait(NULL); 
+    // Wait(NULL); 
+}
+
+// 11.8 
+void sigchild_handler(int sig)
+{
+  /*
+  waitpid(-1, ...): 모든 자식 프로세스를 대상으로
+  WNOHANG: 종료된 자식만 회수, 없으면 즉시 리턴 (비블로킹)
+  > 0: 성공적으로 자식 하나를 회수하면 루프 계속
+  */
+  while (waitpid(-1, NULL, WNOHANG) > 0)
+    ;
 }
